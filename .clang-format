@@ -1,0 +1,33 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab: Never
+ColumnLimit: 100
+
+# 大括号风格
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterFunction: true
+  AfterControlStatement: false
+  AfterStruct: true
+  AfterEnum: true
+  AfterNamespace: true
+
+# 空格规则
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInAngles: false
+SpacesInSquareBrackets: false
+
+# 对齐规则
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+
+# 初始化列表
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ConstructorInitializerIndentWidth: 4
+
+# 换行规则
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
