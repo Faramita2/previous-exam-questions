@@ -64,6 +64,7 @@
         "optional": "cpp",
         "unordered_map": "cpp",
         "algorithm": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "__tree": "cpp"
     }
 }
