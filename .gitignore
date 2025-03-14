@@ -364,3 +364,4 @@ FodyWeavers.xsd
 *tempCodeRunnerFile.cpp
 
 *.dSYM/
+build/
