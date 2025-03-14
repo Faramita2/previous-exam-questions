@@ -73,6 +73,7 @@
         "regex": "cpp",
         "unordered_set": "cpp",
         "bit": "cpp",
-        "span": "cpp"
+        "span": "cpp",
+        "cassert": "cpp"
     }
 }
