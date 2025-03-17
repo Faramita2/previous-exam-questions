@@ -24,26 +24,69 @@ int minDistance(string &str1, string &str2)
     int m = str1.length();
     int n = str2.length();
 
+    if (m == 0)
+        return n;
+    if (n == 0)
+        return m;
+
     vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
-
-    for (int i = 0; i <= m; i++) {
+    for (int i = 0; i < m + 1; i++)
         dp[i][0] = i;
-    }
-    for (int j = 0; j <= n; j++) {
+    for (int j = 0; j < n + 1; j++)
         dp[0][j] = j;
-    }
 
-    for (int i = 1; i <= m; ++i) {
-        for (int j = 1; j <= n; ++j) {
-            if (str1[i - 1] == str2[j - 1]) {
+    for (int i = 1; i < m + 1; i++) {
+        for (int j = 1; j < n + 1; j++) {
+            if (str1[i - 1] == str2[j - 1])
                 dp[i][j] = dp[i - 1][j - 1];
-            } else {
+            else {
                 dp[i][j] =
                     min({dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]}) + 1;
             }
         }
     }
+
     return dp[m][n];
+}
+
+int minDistance_optimized(string &str1, string &str2)
+{
+    int m = str1.length();
+    int n = str2.length();
+
+    // 如果其中一个字符串为空，直接返回另一个字符串的长度
+    if (m == 0)
+        return n;
+    if (n == 0)
+        return m;
+
+    // 上一行的状态
+    vector<int> prev(n + 1, 0);
+    // 当前行的状态
+    vector<int> curr(n + 1, 0);
+
+    // 初始化第一行
+    for (int j = 0; j <= n; j++)
+        prev[j] = j;
+
+    for (int i = 1; i <= m; i++) {
+        // 初始化当前行的第一个元素
+        curr[0] = i;
+        for (int j = 1; j <= n; j++) {
+            if (str1[i - 1] == str2[j - 1]) {
+                curr[j] = prev[j - 1];
+            } else {
+                int insertCost  = curr[j - 1] + 1;
+                int deleteCost  = prev[j] + 1;
+                int replaceCost = prev[j - 1] + 1;
+                curr[j]         = min({insertCost, deleteCost, replaceCost});
+            }
+        }
+        // 当前行转变为下一轮的上一行
+        prev.swap(curr);
+    }
+    // 最终结果存储在prev[n]中
+    return prev[n];
 }
 
 int main()
