@@ -1,40 +1,31 @@
-#include "../BinaryTreeUtil/binary_tree_util.h"
-#include "../PerformanceMonitor/performance_monitor.h"
-#include <cassert>
-#include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
-int solve(vector<int> &values, int total, int startIndex)
-{
-    if (total < 0)
-        return -1;
-    if (total == 0)
-        return 0;
-    for (int i = startIndex; i >= 0; i--) {
-        int tmp = solve(values, total - values[i], i);
-        if (tmp == -1)
-            continue;
-        return tmp + 1;
-    }
-    return -1;
-}
-
-int main()
-{
+int main() {
     ifstream inputFile("input3.txt");
-    int      n, total;
-    inputFile >> total >> n;
-    vector<int> values(n);
-    for (int i = 0; i < n; i++)
-        inputFile >> values[i];
-    sort(values.begin(), values.end());
-    int ans = solve(values, total, values.size() - 1);
-    cout << (ans == -1 ? 0 : ans) << endl;
+    if (!inputFile.is_open()) {
+        cerr << "ERROR" << endl;
+        return 1;
+    }
+    int m, n;
+    inputFile >> m >> n;
+    vector<int> stamps(n, 0);
+    for (int i = 0; i < n; i++) {
+        inputFile >> stamps[i];
+    }
+    vector<int> dp(m + 1, INT32_MAX);
+    dp[0] = 0;
+    for (int stamp : stamps) {
+        for (int j = stamp; j < m + 1; j++) {
+            if (dp[j-stamp] != INT32_MAX) {
+                dp[j] = min(dp[j], dp[j - stamp] + 1);
+            }
+        }
+    }
+    cout << (dp.back() == INT32_MAX ? 0 : dp.back()) << endl;
 
     return 0;
 }
