@@ -33,7 +33,7 @@ void getLeafPath(TreeNode* node, vector<vector<int>>& leafPaths, vector<int>& pa
 int leafPathAmount(const vector<int>& path1, const vector<int>& path2) {
     int i = 0, j = 0;
     while (path1[i] == path2[j] && i < path1.size() && j < path2.size()) {i++;j++;}
-    int amount = path1[i-1];
+    int amount = path1[i - 1];
     while (i < path1.size()) amount += path1[i++];
     while (j < path2.size()) amount += path2[j++];
     return amount;
@@ -43,7 +43,7 @@ int findMaxLeafPath(const vector<vector<int>>& leafPaths) {
     int size = leafPaths.size();
     int maxAmount = 0;
     for (int i = 0; i < size - 1; i++) {
-        for (int j = i+1; j < size; j++) {
+        for (int j = i + 1; j < size; j++) {
             auto path1 = leafPaths[i];
             auto path2 = leafPaths[j];
             maxAmount = max(maxAmount, leafPathAmount(path1, path2));
@@ -65,8 +65,8 @@ int main() {
     }
 
     TreeNode* root = nullptr;
-    for (int i : nums) {
-        root = buildBST(root, i);
+    for (int num : nums) {
+        root = buildBST(root, num);
     }
 
     vector<vector<int>> leafPaths;
