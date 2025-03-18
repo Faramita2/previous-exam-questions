@@ -1,78 +1,57 @@
-#include "../BinaryTreeUtil/binary_tree_util.h"
-#include "../PerformanceMonitor/performance_monitor.h"
-#include <cassert>
-#include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
+#include <fstream>
 #include <vector>
 
 using namespace std;
 
-struct Graph
-{
-    int                 vNums;
-    int                 eNums;
-    vector<vector<int>> matrix;
-};
-
-void dfs(Graph &g, vector<bool> &visited, int start, int skip)
-{
-    if (visited[start])
-        return;
+void dfs(const vector<vector<int>>& graph, int start, vector<bool>& visited, int skip) {
     visited[start] = true;
-    for (int j = 0; j < g.vNums; j++) {
-        if (g.matrix[start][j] == 1 && j != skip && !visited[j]) {
-            dfs(g, visited, j, skip);
-        }
+    for (int neighbor : graph[start]) {
+        if (visited[neighbor] || neighbor == skip) continue;
+        dfs(graph, neighbor, visited, skip);
     }
 }
 
-void findVertex(Graph &g)
-{
-    for (int skip = 0; skip < g.vNums; skip++) {
-        vector<bool> visited(g.vNums, false);
-        dfs(g, visited, 0, skip);
-        for (int i = 0; i < visited.size(); i++) {
-            if (!visited[i] && i != skip) {
-                cout << skip + 1 << endl;
+void findBreakPoint(vector<vector<int>>& graph) {
+    int size = graph.size();
+    for (int skip = 1; skip < size; skip++) {
+        vector<bool> visited(size, false);
+        int start = 1;
+        while (start == skip) start++;
+        dfs(graph, start, visited, skip);
+
+        for (int i = 1; i < size; i++) {
+            if (i == skip) continue;
+            if (visited[i] == false) {
+                cout << skip << endl;
                 return;
-            }
+            } 
         }
     }
+    cout << "not exist" << endl;
 }
 
-int main()
-{
-    Graph    g;
+int main() {
     ifstream inputFile("input4.txt");
-    string   line;
-
-    getline(inputFile, line);
-    g.vNums  = stoi(line);
-    g.matrix = vector<vector<int>>(g.vNums, vector<int>(g.vNums, 0));
-    g.eNums  = 0;
-    while (getline(inputFile, line)) {
-        int          first, second;
-        stringstream ss(line);
-        ss >> first >> second;
-
-        if (g.matrix[first - 1][second - 1] == 0) {
-            g.eNums++;
-        }
-
-        g.matrix[first - 1][second - 1] = 1;
-        g.matrix[second - 1][first - 1] = 1;
+    if (!inputFile.is_open()) {
+        cerr << "ERROR" << endl;
+        return 1;
     }
 
-    for (auto &v : g.matrix) {
-        for (int i : v) {
-            cout << i << " ";
-        }
-        cout << endl;
+    int n;
+    inputFile >> n;
+    vector<vector<int>> graph(n + 1, vector<int>{});
+    int from, to;
+    while (inputFile >> from >> to) {
+        graph[from].push_back(to);
+        graph[to].push_back(from);
     }
 
-    findVertex(g);
+    if (n == 1) {
+        cout << "not exist" << endl;
+    } else {
+        findBreakPoint(graph);
+    }
 
     return 0;
 }

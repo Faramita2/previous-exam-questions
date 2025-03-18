@@ -1,28 +1,25 @@
-#include "../BinaryTreeUtil/binary_tree_util.h"
-#include "../PerformanceMonitor/performance_monitor.h"
-#include <cassert>
-#include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
+#include <fstream>
 
 using namespace std;
 
-int main()
-{
-    string   tmp;
-    int      flag = 0;
+int main() {
     ifstream inputFile("input1.txt");
+    if (!inputFile.is_open()) {
+        cerr << "ERROR" << endl;
+        return 1;
+    }
+
+    string tmp;
+    bool flag = false;
     while (inputFile >> tmp) {
         if (flag) {
             cout << " ";
         }
-        flag   = 1;
+        flag = true;
         tmp[0] = toupper(tmp[0]);
         cout << tmp;
     }
-    cout << endl;
 
     return 0;
 }
