@@ -1,57 +1,39 @@
-#include "../BinaryTreeUtil/binary_tree_util.h"
-#include "../PerformanceMonitor/performance_monitor.h"
-#include <cassert>
-#include <cmath>
-#include <fstream>
 #include <iostream>
-#include <numeric>
-#include <random>
-#include <sstream>
-#include <string>
-#include <vector>
-
+#include <cstdlib>
+#include <ctime>
+#include <set>
+#include <iomanip>
 using namespace std;
 
-#define MIN_AMOUNT 0.01
+int main() {
+    double x;
+    unsigned n;
+    cin >> x >> n;
 
-double roundToRealMoney(double amount)
-{
-    double factor = pow(10.0, 2);
+    int y = static_cast<int>(x * 100 + 0.5);
 
-    return round(amount * factor) / factor;
-}
-
-double generateRandomAmount(double remainAmount, uint32_t remainCount)
-{
-    random_device rd;
-    mt19937       gen(rd());
-
-    double maxAmount =
-        max(MIN_AMOUNT, remainAmount - MIN_AMOUNT * (remainCount - 1));
-
-    uniform_real_distribution<> dist(MIN_AMOUNT, maxAmount);
-    return roundToRealMoney(dist(gen));
-}
-
-int main()
-{
-    double   remainAmount;
-    uint32_t count;
-
-    cin >> remainAmount >> count;
-    remainAmount = roundToRealMoney(remainAmount);
-    while (roundToRealMoney(remainAmount / count) - MIN_AMOUNT < 0) {
-        cout << "Cannot distribute money, input again please!" << endl;
-        cin >> remainAmount >> count;
-        remainAmount = roundToRealMoney(remainAmount);
+    if (y < n) {
+        cout << "ERROR" << endl;
+        return 1;
     }
 
-    for (int i = 0; i < count - 1; i++) {
-        double cur = generateRandomAmount(remainAmount, count - i);
-        cout << fixed << setprecision(2) << cur << " ";
-        remainAmount -= cur;
+    srand(static_cast<unsigned>(time(0)));
+    set<int> splits;
+    splits.insert(0);
+    splits.insert(y);
+
+    while (splits.size() < n + 1) {
+        int div = rand() % (y - 1) + 1;
+        splits.insert(div);
     }
-    cout << fixed << setprecision(2) << remainAmount << endl;
+
+    cout << fixed << setprecision(2);
+    auto prev = splits.begin();
+    for (auto it = next(splits.begin()); it != splits.end(); it++) {
+        cout << (double)(*it - *prev) / 100 << " ";
+        prev = it;
+    }
+    cout << endl;
 
     return 0;
 }

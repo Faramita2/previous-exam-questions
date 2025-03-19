@@ -1,40 +1,26 @@
-#include "../BinaryTreeUtil/binary_tree_util.h"
-#include "../PerformanceMonitor/performance_monitor.h"
-#include <cassert>
-#include <cmath>
-#include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
+#include <iomanip>
+#include <cmath>
 
 using namespace std;
 
-#define PRECISE 0.00000001
-
-double func(double x)
-{
+double func(double x) {
     return 2 * pow(x, 11) - 3 * pow(x, 8) - 5 * pow(x, 3) - 1;
 }
 
-// 求多项式的根2x^11 - 3x^8 - 5x^3 - 1 = 0，根的精度为0.00000001
-double solve(double (*func)(double), double l, double r)
-{
-    if (r - l < PRECISE)
-        return l;
-    double mid = (r + l) / 2;
-    double tmp = func(mid);
-    if (tmp > 0)
-        return solve(func, l, mid);
-    else if (tmp < 0)
-        return solve(func, mid, r);
-    else
-        return mid;
-}
-
-int main()
-{
-    cout << solve(func, 1, 2) << endl;
+int main() {
+    double low = 1, high = 2;
+    while (high - low > 0.00000001) {
+        double mid = low + (high - low) / 2;
+        double mval = func(mid);
+        if (mval > 0) high = mid;
+        else if (mval < 0) low = mid;
+        else {
+            cout << fixed << setprecision(8) << mval << endl;
+            return 0;
+        }
+    }
+    cout << fixed << setprecision(8) << low << endl;
 
     return 0;
 }
