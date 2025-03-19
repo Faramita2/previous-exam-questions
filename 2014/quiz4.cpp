@@ -1,63 +1,41 @@
-#include <cassert>
-#include <fstream>
 #include <iostream>
-#include <queue>
-#include <sstream>
-#include <string>
+#include <fstream>
 #include <vector>
+#include <queue>
 
 using namespace std;
 
-int main()
-{
-    ifstream inputFile("graph.in");
-    if (!inputFile.is_open()) {
-        cerr << "Error, cannot open graph.in." << endl;
-        return 1;
-    }
+int main() {
     int n;
+    ifstream inputFile("graph.in");
     inputFile >> n;
-    inputFile.ignore();
-    int                 from, to;
-    string              line;
-    vector<vector<int>> graph(n + 1);
-    while (getline(inputFile, line)) {
-        istringstream iss(line);
-        iss >> from >> to;
-        if (from == 0 && to == 0)
-            break;
+    vector<vector<int>> graph(n + 1, vector<int>{});
+    int from, to;
+    while (inputFile >> from >> to) {
+        if (from == 0 && to == 0) break;
         graph[from].push_back(to);
         graph[to].push_back(from);
     }
 
+    cout << 1;
     vector<bool> visited(n + 1, false);
-    queue<int>   next;
-    next.push(1);
     visited[1] = true;
-
-    vector<int> vertexes;
-    while (!next.empty()) {
-        int cur = next.front();
-        next.pop();
-
-        vertexes.push_back(cur);
-
+    queue<int> q;
+    for (int neighbor : graph[1]) {
+        q.push(neighbor);
+    }
+    
+    while (!q.empty()) {
+        int cur = q.front(); q.pop();
+        if (visited[cur]) continue;
+        cout << " ";
+        cout << cur;
+        visited[cur] = true;
         for (int neighbor : graph[cur]) {
-            if (!visited[neighbor]) {
-                visited[neighbor] = true;
-                next.push(neighbor);
-            }
+            if (visited[neighbor]) continue;
+            q.push(neighbor);
         }
     }
-
-    ostringstream output;
-    for (int v : vertexes) {
-        output << v;
-        if (n-- > 1)
-            output << " ";
-    }
-
-    cout << output.str() << endl;
 
     return 0;
 }
