@@ -1,109 +1,79 @@
-#include "../PerformanceMonitor/performance_monitor.h"
-#include <cassert>
-#include <fstream>
 #include <iostream>
-#include <queue>
-#include <sstream>
-#include <string>
-#include <unordered_map>
+#include <fstream>
 #include <vector>
+#include <sstream>
+#include <unordered_map>
+#include <map>
+#include <queue>
 
 using namespace std;
 
-struct TreeNode
-{
-    char      val;
-    TreeNode *left;
-    TreeNode *right;
-    TreeNode(char x) : val(x), left(nullptr), right(nullptr) {};
-    TreeNode(char x, TreeNode *left) : val(x), left(left), right(nullptr) {};
-    TreeNode(char x, TreeNode *left, TreeNode *right)
-        : val(x), left(left), right(right) {};
+struct TreeNode {
+    char val;
+    TreeNode *left, *right;
+    TreeNode(char val): val(val), left(nullptr), right(nullptr) {}
 };
 
-TreeNode *buildTree(char c, unordered_map<char, vector<char>> &nodeChildren,
-                    unordered_map<char, TreeNode *> &nodeMap)
-{
-    TreeNode *node;
-    if (!nodeMap.count(c)) {
-        node       = new TreeNode(c);
-        nodeMap[c] = node;
-    } else
-        node = nodeMap[c];
-
-    if (!nodeChildren.count(c))
-        return node;
-    else {
-        auto children = nodeChildren[c];
-        node->left    = buildTree(children[0], nodeChildren, nodeMap);
-        node->right   = children.size() == 1
-                            ? nullptr
-                            : buildTree(children[1], nodeChildren, nodeMap);
-    }
-
-    return node;
-}
-
-void output(TreeNode *root, ofstream &outputFile)
-{
-    if (root == nullptr)
-        return;
-
-    queue<TreeNode *> q;
-    q.push(root);
+void printOdd(queue<TreeNode*>& q, ofstream& outputFile) {
     int level = 1;
-
     while (!q.empty()) {
-        int  size    = q.size();
+        int size = q.size();
         bool isFirst = true;
-
-        for (int i = 0; i < size; i++) {
-            auto node = q.front();
-            q.pop();
-
-            if (level % 2 == 1) {
-                if (isFirst) {
-                    isFirst = false;
-                    outputFile << "第" << " " << level << " 层结点: ";
-                }
-                outputFile << node->val;
-                if (i != size - 1)
-                    outputFile << ",";
-            }
-
-            if (node->left != nullptr)
-                q.push(node->left);
-            if (node->right != nullptr)
-                q.push(node->right);
+        if (level % 2 == 1) {
+            outputFile << "第 " << level << " 层结点: ";
         }
-        if (level % 2 == 1)
-            outputFile << endl;
+        for (int i = 0; i < size; i++) {
+            TreeNode* node = q.front(); q.pop();
+            if (level % 2 == 1) {
+                if (!isFirst) outputFile << ",";
+                isFirst = false;
+                outputFile << node->val;
+            } 
+            if (node->left != nullptr) q.push(node->left);
+            if (node->right != nullptr) q.push(node->right);
+        }
+        if (level % 2 == 1) outputFile << endl;
         level++;
     }
 }
 
-int main()
-{
-    unordered_map<char, vector<char>> nodeChildren;
-    unordered_map<char, TreeNode *>   nodeMap;
-    ifstream                          inputFile("input_3.txt");
-    ofstream                          outputFile("output_3.txt");
-    string                            line;
+int main() {
+    ifstream inputFile("input_3.txt");
+    ofstream outputFile("output_3.txt");
+    
+    map<char, int> indegrees;
+    unordered_map<char, TreeNode*> nodeMap;
+    string line;
+    char a, b, c;
     while (getline(inputFile, line)) {
         istringstream iss(line);
-        char          node, left, right;
-        iss >> node >> left;
-        vector<char> children = {left};
-        if (iss >> right) {
-            children.push_back(right);
+        iss >> a >> b;
+        if (!nodeMap[a]) {
+            nodeMap[a] = new TreeNode(a);
+            indegrees[a] = 0;
         }
-        nodeChildren[node] = children;
-    }
-    inputFile.close();
-    auto root = buildTree('A', nodeChildren, nodeMap);
+        if (!nodeMap[b]) {
+            nodeMap[b] = new TreeNode(b);
+        }
 
-    output(root, outputFile);
-    outputFile.close();
+
+        nodeMap[a]->left = nodeMap[b];
+        indegrees[b]++;
+        
+        if (iss >> c) {
+            if (!nodeMap[c])
+                nodeMap[c] = new TreeNode(c);
+            nodeMap[a]->right = nodeMap[c];
+            indegrees[c]++;
+        }
+    }
+
+    auto p = *indegrees.begin();
+    TreeNode *root = nodeMap[p.first];
+
+    queue<TreeNode*> q;
+    q.push(root);
+    printOdd(q, outputFile);
 
     return 0;
 }
