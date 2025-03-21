@@ -7,37 +7,39 @@
 
 using namespace std;
 
-int kmp(string &main, string &sub)
-{
-    int len1 = main.length(), len2 = sub.length();
-
-    vector<int> next(len2, 0);
-    for (int i = 1; i < len2; i++) {
-        if (sub[i] == sub[next[i - 1]])
-            next[i] = next[i - 1] + 1;
-        else if (sub[i] == sub[0])
-            next[i] = 1;
-        else
-            next[i] = 0;
-    }
-    for (int i = len2 - 1; i >= 1; i--) {
-        next[i] = next[i - 1];
-    }
+vector<int> getNext(string& sub) {
+    int len = sub.length();
+    vector<int> next(len);
     next[0] = -1;
+    int j = -1;
+    for (int i = 1; i < len; i++) {
+        while (j != -1 && sub[i] != sub[j + 1]) {
+            j = next[j - 1];
+        }
+        if (sub[i] == sub[j + 1]) j++;
+        next[i] = j;
+    }
+    return next;
+}
+
+int kmp(string &str, string &sub)
+{
+    vector<int> next = getNext(sub);
+
+    int n = str.length();
+    int m = sub.length();
     int i = 0, j = 0;
-    while (i < len1 && j < len2) {
-        if (main[i] == sub[j]) {
+    while (i < n) {
+        if (j == -1 || str[i] == sub[j]) {
             i++;
             j++;
         } else {
-            if (next[j] == -1)
-                i++;
-            else
-                j = next[j];
+            j = next[j];
+        }
+        if (j == m) {
+            return i - j;
         }
     }
-    if (j == len2)
-        return i - j;
     return -1;
 }
 

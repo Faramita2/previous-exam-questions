@@ -1,9 +1,6 @@
-#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <queue>
-#include <sstream>
-#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -18,14 +15,12 @@ struct TreeNode
     }
 };
 
-struct Cmp
-{
-    bool operator()(TreeNode *l, TreeNode *r)
-    {
-        // 从小到大
-        return l->val > r->val;
+struct Cmp {
+    bool operator()(TreeNode *l, TreeNode *r) {
+        return l->val > r->val; // 小顶堆
     }
 };
+
 
 unordered_map<TreeNode *, int> idxMap;
 vector<string>                 ans;
@@ -40,11 +35,11 @@ void preOrder(TreeNode *root)
         return;
     }
 
-    tmp += "0";
+    tmp.push_back('0');
     preOrder(root->lchild);
     tmp.pop_back();
 
-    tmp += "1";
+    tmp.push_back('1');
     preOrder(root->rchild);
     tmp.pop_back();
 }

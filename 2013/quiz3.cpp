@@ -1,25 +1,20 @@
-#include <cassert>
-#include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
+#include <fstream>
 
 using namespace std;
 
-int main()
-{
+int main() {
     ifstream inputFile("3.in");
     ofstream outputFile("3.out");
-    int      n;
+    int n;
     inputFile >> n;
-    string res = "";
+    string s = "";
     while (n > 0) {
-        res += to_string(n % 2);
+        s.push_back('0' + n % 2);
         n /= 2;
     }
-    reverse(res.begin(), res.end());
-    outputFile << res;
+    reverse(s.begin(), s.end());
+    outputFile << s;
 
     return 0;
 }

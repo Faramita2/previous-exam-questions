@@ -1,62 +1,50 @@
-#include <cassert>
-#include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
+#include <fstream>
 #include <vector>
 
 using namespace std;
-vector<vector<int>> board;
 
-int res = 0;
+bool isSafe(vector<vector<int>>& board, int row, int col) {
+    for (int i = 0; i < row; i++) {
+        if (board[i][col] == 1) return false;
+    }
 
-bool isSafe(int row, int col)
-{
-    // 同列
-    for (int i = row - 1; i >= 0; i--) {
-        if (board[i][col] == 1)
-            return false;
+    for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
+        if (board[i][j] == 1) return false;
     }
-    // 左上角
-    for (int j = col - 1, i = row - 1; j >= 0 && i >= 0; j--, i--) {
-        if (board[i][j] == 1)
-            return false;
-    }
-    // 右上角
-    for (int j = col + 1, i = row - 1; j < board.size() && i >= 0; j++, i--) {
-        if (board[i][j] == 1)
-            return false;
+
+    for (int i = row - 1, j = col + 1; i >= 0 && j < board.size(); i--, j++) {
+        if (board[i][j] == 1) return false;
     }
 
     return true;
 }
 
-void backtracking(int rowNum)
-{
-    if (rowNum == board.size())
-        res++;
-
-    for (int col = 0; col < board.size(); col++) {
-        if (isSafe(rowNum, col)) {
-            board[rowNum][col] = 1;
-            backtracking(rowNum + 1);
-            board[rowNum][col] = 0;
+void backtracking(vector<vector<int>>& board, int startIndex, int& count) {
+    if (startIndex == board.size()) {
+        count++;
+        return;
+    }
+    for (int j = 0; j < board.size(); j++) {
+        if (isSafe(board, startIndex, j)) {
+            board[startIndex][j] = 1;
+            backtracking(board, startIndex + 1, count);
+            board[startIndex][j] = 0;
         }
     }
 }
 
-int main()
-{
+int main() {
     ifstream inputFile("5.in");
     ofstream outputFile("5.out");
-    int      n;
-    inputFile >> n;
-    cout << "n: " << n << endl;
-    board = vector(n, vector<int>(n, 0));
-    backtracking(0);
 
-    cout << "res: " << res << endl;
-    outputFile << res;
+    int n;
+    inputFile >> n;
+    vector<vector<int>> board(n, vector<int>(n, 0));
+    int start = 0;
+    int count = 0;
+    backtracking(board, start, count);
+    outputFile << count;
 
     return 0;
 }
