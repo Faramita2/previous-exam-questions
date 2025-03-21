@@ -1,36 +1,30 @@
-#include <cassert>
-#include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
+#include <fstream>
 
 using namespace std;
 
-int main()
-{
+int main() {
     ifstream inputFile("number.in");
-    int      n;
-    inputFile >> n;
-    inputFile.ignore();
-    int num;
-    int minNum = INT_MAX, maxNum = INT_MIN;
-    for (int i = 0; i < n; i++) {
-        inputFile >> num;
-        minNum = min(minNum, num);
-        maxNum = max(maxNum, num);
-    }
     ofstream outputFile("number.out");
-    cout << minNum << " " << maxNum << " ";
-    outputFile << minNum << " " << maxNum << " ";
+    int n;
+    inputFile >> n;
 
-    while (minNum != 0) {
-        int remain = maxNum % minNum;
-        maxNum     = minNum;
-        minNum     = remain;
+    int maxValue = 0, minValue = INT_MAX, value;
+    for (int i = 0; i < n; i++) {
+        inputFile >> value;
+        maxValue = max(value, maxValue);
+        minValue = min(value, minValue);
     }
-    cout << maxNum;
-    outputFile << maxNum;
+
+    int a = maxValue, b = minValue, tmp;
+
+    while (b != 0) {
+        tmp = a % b;
+        a = b;
+        b = tmp;
+    }
+
+    outputFile << minValue << " " << maxValue << " " << a;
 
     return 0;
 }
