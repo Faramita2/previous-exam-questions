@@ -1,9 +1,6 @@
-#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <regex>
-#include <sstream>
-#include <string>
 #include <vector>
 
 using namespace std;
@@ -16,8 +13,12 @@ int main()
     bool found = false;
 
     string line;
+    smatch baseMatch;
     while (getline(inputFile, line)) {
-        if (regex_search(line, pattern)) {
+        if (regex_search(line, baseMatch, pattern)) {
+            for (auto b : baseMatch) {
+                cout << "base match: " << b.str() << endl;
+            }
             found = true;
             break;
         }
