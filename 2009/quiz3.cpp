@@ -1,76 +1,52 @@
-#include <cassert>
 #include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
 #include <vector>
 
 using namespace std;
 
-ifstream inputFile("tree.in");
-
-struct TreeNode
-{
-    char      val;
+struct TreeNode {
+    char val;
     TreeNode *left, *right;
-    TreeNode(char val) : val(val), left(nullptr), right(nullptr)
-    {
-    }
+    TreeNode(char val): val(val), left(nullptr), right(nullptr) {}
 };
 
-int height = 0;
-
-TreeNode *buildTree(const string &s, int &index)
-{
-    if (index >= s.size() || s[index] == '0') {
-        index++;
-        return nullptr;
-    }
-
-    TreeNode *node = new TreeNode(s[index++]);
-
-    node->left  = buildTree(s, index);
-    node->right = buildTree(s, index);
-
+TreeNode* buildTree(vector<char>& chars, int& idx) {
+    if (chars[idx] == '0') return nullptr;
+    TreeNode *node = new TreeNode(chars[idx]);
+    node->left = buildTree(chars, ++idx);
+    node->right = buildTree(chars, ++idx);
     return node;
 }
 
-int getHeight(TreeNode *node)
-{
-    if (node == nullptr)
-        return -1;
-    int lHeight = getHeight(node->left);
-    int rHeight = getHeight(node->right);
-    return max(lHeight, rHeight) + 1;
+int getDepth(TreeNode *node) {
+    if (node == nullptr) return 0;
+    return max(getDepth(node->left), getDepth(node->right)) + 1;
 }
 
-void lnr(TreeNode *node, int curHeight, bool &isFirst)
-{
-    if (node == nullptr)
-        return;
-    lnr(node->left, curHeight + 1, isFirst);
-    if (curHeight <= height / 2) {
-        if (!isFirst)
-            cout << " ";
-        cout << node->val;
+void lnr(TreeNode *node, int depth, int maxDepth, bool& isFirst) {
+    if (node == nullptr) return;
+    lnr(node->left, depth + 1, maxDepth, isFirst);
+    if (depth <= maxDepth / 2) {
+        if (!isFirst) cout << " ";
         isFirst = false;
+        cout << node->val;
     }
-    lnr(node->right, curHeight + 1, isFirst);
+    lnr(node->right, depth + 1, maxDepth, isFirst);
 }
 
-int main()
-{
-    string chars;
-    inputFile >> chars;
-    cout << chars << endl;
+int main() {
+    ifstream inputFile("tree.in");
+    char c;
+    vector<char> chars;
+    while (inputFile >> c) {
+        chars.push_back(c);
+    }
 
-    int       index = 0;
-    TreeNode *root  = buildTree(chars, index);
-
-    height = getHeight(root);
-    cout << "height: " << height << endl;
+    int idx = 0;
+    TreeNode *root = buildTree(chars, idx);
+    int depth = getDepth(root);
     bool isFirst = true;
-    lnr(root, 0, isFirst);
+    lnr(root, 1, depth, isFirst);
 
     return 0;
 }

@@ -1,26 +1,22 @@
 #include <bitset>
-#include <cassert>
-#include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
 
 using namespace std;
 
-int main()
-{
-    unsigned int num;
-    cin >> num;
-    bitset<16> bits(num);
-    bitset<4>  result(0);
-    for (int i = 0; i < 4; ++i) {
-        bool xorResult = 0;
-        for (int j = 0; j < 4; ++j) {
-            xorResult ^= bits[i * 4 + j];
+int main() {
+    int16_t tmp;
+    cin >> tmp;
+    bitset<16> num(tmp);
+    bitset<4> result(0);
+
+    for (int i = 0; i < 4; i++) {
+        int xorResult = 0;
+        for (int j = 0; j < 4; j++) {
+            xorResult ^= num[j];
         }
-        result[i] = xorResult;
+        result = xorResult;
     }
+
     cout << result.to_ulong() << endl;
 
     return 0;
