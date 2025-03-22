@@ -1,20 +1,23 @@
-#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <queue>
-#include <sstream>
-#include <string>
 #include <vector>
 
 using namespace std;
 
+struct Cmp {
+    bool operator() (int a, int b) {
+        return a > b;
+    }
+};
+
 int solvedByMaxHeap(const vector<int> &nums, int k)
 {
-    priority_queue<int, vector<int>, less<int>> q;
+    priority_queue<int, vector<int>, Cmp> q;
     for (int i : nums)
         q.push(i);
 
-    while (k > 1)
+    while (k-- > 1)
         q.pop();
 
     return q.top();
@@ -24,10 +27,10 @@ int partition(vector<int> &nums, int low, int high)
 {
     int pivot = nums[low];
     while (low < high) {
-        while (low < high && nums[high] <= pivot)
+        while (low < high && nums[high] >= pivot)
             high--;
         nums[low] = nums[high];
-        while (low < high && nums[low] > pivot)
+        while (low < high && nums[low] < pivot)
             low++;
         nums[high] = nums[low];
     }
@@ -60,13 +63,9 @@ int main()
         inputFile >> nums[i];
     }
 
-    // max heap solution
-    // int res = solvedByMaxHeap(nums, k);
-
     // quick select solution(optimal)
-    int res = solvedByQuickSelect(nums, 0, nums.size() - 1, k - 1);
-
-    cout << res << endl;
+    cout << solvedByQuickSelect(nums, 0, nums.size() - 1, k - 1) << endl;
+    // cout << solvedByMaxHeap(nums, k) << endl;
 
     return 0;
 }
