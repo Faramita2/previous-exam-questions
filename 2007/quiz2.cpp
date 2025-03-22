@@ -1,34 +1,39 @@
-#include <cassert>
-#include <fstream>
 #include <iostream>
 #include <queue>
-#include <sstream>
-#include <string>
 #include <vector>
 
 using namespace std;
 
-int main()
-{
+int main() {
     int n;
     cin >> n;
+
     queue<int> q;
-    for (int i = 1; i <= n; i++)
+    for (int i = 1; i <= n; i++) {
         q.push(i);
-    int cnt = 1, flag = 0;
+    }
+
+    vector<int> result;
+
+    bool countFlag = true;
+
     while (!q.empty()) {
-        if (cnt == 1) {
-            if (flag)
-                cout << " ";
-            flag = 1;
-            cout << q.front();
-            q.pop();
-            cnt = 2;
+        int person = q.front();
+        q.pop();
+
+        if (countFlag) {
+            result.push_back(person);
         } else {
-            q.push(q.front());
-            q.pop();
-            cnt = 1;
+            q.push(person);
         }
+        countFlag = !countFlag;
+    }
+
+    bool isFirst = true;
+    for (int i : result) {
+        if (!isFirst) cout << " ";
+        isFirst = false;
+        cout << i;
     }
 
     return 0;

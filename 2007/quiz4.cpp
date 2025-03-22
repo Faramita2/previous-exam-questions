@@ -1,86 +1,64 @@
-#include <cassert>
 #include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
+#include <memory>
 
 using namespace std;
 
-ifstream                 inputFile("4.in");
-ofstream                 outputFile("4.out");
-int                      n;
-vector<char>             inorder;
-vector<char>             postorder;
-unordered_map<char, int> inorderIndexMap;
+unordered_map<char, int> inorderMap;
 
-struct TreeNode
-{
-    char      val;
-    TreeNode *left, *right;
-    TreeNode(char val) : val(val), left(nullptr), right(nullptr)
-    {
-    }
+struct TreeNode {
+    char val;
+    shared_ptr<TreeNode> left, right;
+    TreeNode(char val): val(val), left(nullptr), right(nullptr) {}
 };
 
-TreeNode *buildTree(int instart, int inend, int poststart, int postend)
-{
-    if (inend - instart == 0 || postend - poststart == 0)
-        return nullptr;
-    TreeNode *node = new TreeNode(postorder[postend - 1]);
-
-    int pos           = inorderIndexMap[node->val];
+shared_ptr<TreeNode> buildTree(const vector<char>& inorder, int instart, int inend, const vector<char>& postorder, int poststart, int postend) {
+    if (instart > inend || poststart > postend) return nullptr;
+    auto root = make_shared<TreeNode>(postorder[postend]);
+    int pos = inorderMap[root->val];
     int leftNodeCount = pos - instart;
-    node->left = buildTree(instart, pos, poststart, poststart + leftNodeCount);
-    node->right =
-        buildTree(pos + 1, inend, poststart + leftNodeCount, postend - 1);
-    return node;
+    root->left = buildTree(inorder, instart, pos - 1, postorder, poststart, poststart + leftNodeCount - 1);
+    root->right = buildTree(inorder, pos + 1, inend, postorder, poststart + leftNodeCount, postend - 1);
+    return root;
 }
 
-void nlr(TreeNode *node, bool &isFirst)
-{
-    if (node == nullptr)
-        return;
-    if (!isFirst) {
-        outputFile << " ";
-    } else
-        isFirst = false;
-    outputFile << node->val;
-    nlr(node->left, isFirst);
-    nlr(node->right, isFirst);
+void preorder(shared_ptr<TreeNode> root, bool& isFirst, ofstream& outputFile) {
+    if (root == nullptr) return;
+    if (!isFirst) outputFile << " ";
+    isFirst = false;
+    outputFile << root->val;
+    preorder(root->left, isFirst, outputFile);
+    preorder(root->right, isFirst, outputFile);
 }
 
-int main()
-{
+int main() {
+    ifstream inputFile("4.in");
+    if (!inputFile.is_open()) {
+        cerr << "Cannot open 4.in" << endl;
+        return 1;
+    }
+    int n;
     inputFile >> n;
-    char tmp;
+    vector<char> inorder(n);
     for (int i = 0; i < n; i++) {
-        inputFile >> tmp;
-        inorder.push_back(tmp);
-        inorderIndexMap[tmp] = i;
+        inputFile >> inorder[i];
+        inorderMap[inorder[i]] = i;
     }
-
-    for (int i = 0; i < n; i++) {
-        inputFile >> tmp;
-        postorder.push_back(tmp);
-    }
-
-    // for (char c : inorder)
-    //     cout << c << " ";
-    // cout << endl;
-
-    // for (char c : postorder)
-    //     cout << c << " ";
-    // cout << endl;
-
-    // for (auto &p : inorderIndexMap)
-    //     cout << p.first << " : " << p.second << endl;
-
-    TreeNode *root = buildTree(0, n, 0, n);
-
+    vector<char> postorder(n);
+    for (int i = 0; i < n; i++) inputFile >> postorder[i];
+    inputFile.close();
+    
+    auto root = buildTree(inorder, 0, n - 1, postorder, 0, n - 1);
     bool isFirst = true;
-    nlr(root, isFirst);
+    ofstream outputFile("4.out");
+    if (!outputFile.is_open()) {
+        cerr << "Cannot open 4.out" << endl;
+        return 1;
+    }
+    preorder(root, isFirst, outputFile);
+    outputFile.close();
 
     return 0;
 }

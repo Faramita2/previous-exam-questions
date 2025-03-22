@@ -1,80 +1,78 @@
-#include <cassert>
 #include <fstream>
 #include <iostream>
-#include <queue>
-#include <sstream>
-#include <string>
 #include <vector>
 
 using namespace std;
 
-struct Edge
-{
+struct Edge {
     int from, to, dist;
-    Edge(int from, int to, int dist) : from(from), to(to), dist(dist)
-    {
-    }
+    Edge(int from, int to, int dist): from(from), to(to), dist(dist) {}
 };
 
-struct Cmp
-{
-    bool operator()(const Edge &lE, const Edge &rE)
-    {
-        return lE.dist > rE.dist;
-    }
-};
-
-ifstream inputFile("3.in");
-ofstream outputFile("3.out");
-
-int                                     n;
-vector<Edge>                            mst;
-priority_queue<Edge, vector<Edge>, Cmp> edges;
-vector<int>                             unionSet;
-int                                     setIdx = 1;
-
-void kruskal()
-{
-    while (!edges.empty()) {
-        auto e = edges.top();
-        edges.pop();
-        int from = e.from, to = e.to;
-        int set1 = unionSet[from], set2 = unionSet[to];
-        if (!set1 && !set2) {
-            unionSet[from] = unionSet[to] = setIdx++;
-        } else if (set1 && set2) {
-            if (set1 == set2)
-                continue;
-            for (auto &s : unionSet) {
-                if (s == set2)
-                    s = set1;
-            }
-        } else {
-            if (!set1)
-                unionSet[from] = set2;
-            if (!set2)
-                unionSet[to] = set1;
+class UnionSet {
+    vector<int> data;
+    public:
+        UnionSet(int n): data(n) {
+            for (int i = 0; i < n; i++) data[i] = i;
         }
-        mst.push_back(e);
-    }
-}
 
-int main()
-{
+        int find(int x) {
+            if (data[x] != x) {
+                data[x] = find(data[x]);
+            }
+            return data[x];
+        }
+
+        void unite(int a, int b) {
+            data[find(a)] = find(b);
+        }
+};
+
+int main() {
+    ifstream inputFile("3.in");
+    if (!inputFile.is_open()) {
+        cerr << "3.in cannot be opened." << endl;
+        return 1;
+    }
+    int n;
     inputFile >> n;
-    unionSet = vector<int>(n + 1, 0);
 
-    int from, to, dist;
-
-    while (inputFile >> from >> to >> dist) {
-        edges.push(Edge(from, to, dist));
-    };
-
-    kruskal();
-
-    for (auto &e : mst) {
-        outputFile << e.from << " -- " << e.to << " : " << e.dist << endl;
+    int a, b, c;
+    vector<Edge> edges;
+    while (inputFile >> a >> b >> c) {
+        edges.push_back(Edge(a, b, c));
     }
+    inputFile.close();
+
+    sort(edges.begin(), edges.end(), [](const auto &l, const auto &r) { return l.dist < r.dist; });
+
+    UnionSet us(n);
+    vector<Edge> mst;
+    for (auto &e : edges) {
+        if (us.find(e.from) != us.find(e.to)) {
+            mst.push_back(e);
+            us.unite(e.from, e.to);
+            if (mst.size() == n - 1) break;
+        }
+    }
+
+    ofstream outputFile("3.out");
+    if (!outputFile.is_open()) {
+        cerr << "3.out cannot be opened." << endl;
+        return 1;
+    }
+    // the last line doesn't have \n
+    for (int i = 0; i < mst.size(); i++) {
+        const auto& e = mst[i];
+        outputFile << e.from << " -- " << e.to << " : " << e.dist;
+        if (i < mst.size() - 1) outputFile << endl;
+    }
+    // the last line has \n
+
+    // for (auto& e : mst) {
+    //     outputFile << e.from << " -- " << e.to << " : " << e.dist << endl;
+    // }
+    outputFile.close();
 
     return 0;
 }
