@@ -1,32 +1,37 @@
-#include <cassert>
 #include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
 #include <vector>
+#include <climits>
 
 using namespace std;
 
-int main()
-{
-    ifstream    inputFile("number.in");
-    ofstream    outputFile("number.out");
-    int         n;
+int main() {
+    ifstream fin("number.in");
+    if (!fin.is_open()) {
+        cerr << "Cannot open number.in" << endl;
+        return 1;
+    }
     vector<int> nums;
-    while (inputFile >> n) {
-        nums.push_back(n);
+    int num;
+    while (fin >> num) {
+        nums.push_back(num);
     }
-    int res = INT_MIN;
-    int cur = 0;
-    for (int i : nums) {
-        if (cur <= 0) {
-            cur = max(i, cur);
-        } else {
-            cur += i;
-            res = max(cur, res);
-        }
+    fin.close();
+
+    int maxSum = INT_MIN;
+    int curSum = 0;
+    for (size_t i = 0; i < nums.size(); i++) {
+        curSum = max(nums[i], nums[i] + curSum);
+        maxSum = max(curSum, maxSum);
     }
-    outputFile << res;
+
+    ofstream fout("number.out");
+    if (!fout.is_open()) {
+        cerr << "Cannot open number.out" << endl;
+        return 1;
+    }
+    fout << maxSum;
+    fout.close();
 
     return 0;
 }

@@ -1,75 +1,62 @@
-#include <cassert>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <stack>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
-int precedence(char op)
-{
-    if (op == '+' || op == '-')
-        return 1;
-    if (op == '*' || op == '/')
-        return 2;
-    return 0;
-}
-
-bool isOperator(char c)
-{
+bool isOperator(char c) {
     return c == '+' || c == '-' || c == '*' || c == '/';
 }
 
-string infixToPostfix(const string &infix)
-{
+int getPriority(char c) {
+    if (c == '+' || c == '-') return 1;
+    if (c == '*' || c == '/') return 2;
+    return 0;
+}
+
+int main() {
+    ifstream inputFile("expr.in");
+    if (!inputFile.is_open()) {
+        cerr << "Cannot open expr.in" << endl;
+        return 1;
+    }
+    ofstream outputFile("expr.out");
+    if (!outputFile.is_open()) {
+        cerr << "Cannot open expr.out" << endl;
+        return 1;
+    }
+    char tmp;
     stack<char> operators;
-    string      postfix;
-
-    for (size_t i = 0; i < infix.length(); i++) {
-        char ch = infix[i];
-
-        if (isalnum(ch)) {
-            postfix += ch;
-        } else if (ch == '(') {
-            operators.push(ch);
-        } else if (ch == ')') {
+    string line;
+    getline(inputFile, line);
+    inputFile.close();
+    istringstream iss(line);
+    while (iss >> tmp) {
+        if (isalpha(tmp)) {
+            outputFile << tmp;
+        } else if (tmp == '(') {
+            operators.push(tmp);
+        } else if (isOperator(tmp)) {
+            while (!operators.empty() && operators.top() != '(' && getPriority(tmp) <= getPriority(operators.top())) {
+                outputFile << operators.top();
+                operators.pop();
+            } 
+            operators.push(tmp);
+        } else if (tmp == ')') {
             while (!operators.empty() && operators.top() != '(') {
-                postfix += operators.top();
+                outputFile << operators.top();
                 operators.pop();
             }
-            operators.pop();
-        } else if (isOperator(ch)) {
-            while (!operators.empty() &&
-                   precedence(operators.top()) >= precedence(ch)) {
-                postfix += operators.top();
-                operators.pop();
-            }
-            operators.push(ch);
+            if (!operators.empty()) operators.pop();
         }
     }
 
     while (!operators.empty()) {
-        postfix += operators.top();
+        if (operators.top() != '(') outputFile << operators.top();
         operators.pop();
     }
-
-    return postfix;
-}
-
-int main()
-{
-    ifstream inputFile("expr.in");
-    ofstream outputFile("expr.out");
-    string   in;
-    inputFile >> in;
-
-    string postfix = infixToPostfix(in);
-
-    outputFile << postfix;
+    outputFile.close();
 
     return 0;
 }

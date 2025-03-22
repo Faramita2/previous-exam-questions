@@ -1,110 +1,58 @@
-#include <cassert>
-#include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
-ifstream            inputFile("graph.in");
-ofstream            outputFile("graph.out");
-vector<vector<int>> graph;
-vector<bool>        visited;
-int                 n, k;
-int                 maxNodeCount = 0;
-vector<int>         indexes;
-
-void getMaxNodes(int i, int &curNodeCount)
-{
-    if (visited[i])
-        return;
-    visited[i] = true;
-    curNodeCount++;
-    maxNodeCount = max(curNodeCount, maxNodeCount);
-
-    for (int j = 0; j < n; j++) {
-        if (i == j || graph[i][j] == 0 || visited[j])
-            continue;
-        getMaxNodes(j, curNodeCount);
+void dfs(const vector<vector<int>>& graph, vector<bool>& visited, size_t start, vector<size_t>& component) {
+    component.push_back(start);
+    visited[start] = true;
+    for (size_t i = 0; i < graph.size(); i++) {
+        if (visited[i] || graph[start][i] == 0) continue;
+        dfs(graph, visited, i, component);
     }
 }
 
-void dfs(int i, int &curNodeCount)
-{
-    if (visited[i])
-        return;
-    visited[i] = true;
-    curNodeCount++;
-    if (curNodeCount == maxNodeCount) {
-        indexes.push_back(i);
-        return;
+int main() {
+    ifstream fin("graph.in");
+    if (!fin.is_open()) {
+        cerr << "Cannot open graph.in" << endl;
+        return 1;
     }
-
-    for (int j = 0; j < n; j++) {
-        if (i == j || graph[i][j] == 0 || visited[j])
-            continue;
-        dfs(j, curNodeCount);
-    }
-}
-
-void print(int i, bool &isFirst)
-{
-    if (visited[i])
-        return;
-
-    if (!isFirst) {
-        outputFile << " ";
-    }
-    outputFile << i;
-    visited[i] = true;
-    isFirst    = false;
-
-    for (int j = 0; j < n; j++) {
-        if (i == j || graph[i][j] == 0 || visited[j])
-            continue;
-        print(j, isFirst);
-    }
-}
-
-int main()
-{
-
-    inputFile >> n >> k;
-    graph   = vector<vector<int>>(n, vector<int>(n, 0));
-    visited = vector<bool>(n, false);
+    int n, k;
+    fin >> n >> k;
+    vector<vector<int>> graph(n, vector<int>(n, 0));
     int from, to;
     for (int i = 0; i < k; i++) {
-        inputFile >> from >> to;
+        fin >> from >> to;
         graph[from][to] = 1;
         graph[to][from] = 1;
     }
+    fin.close();
 
-    // calculate max nodes
-    for (int i = 0; i < n; i++) {
-        if (visited[i])
-            continue;
-        int curNodeCount = 0;
-        getMaxNodes(i, curNodeCount);
+    vector<bool> visited(n, false);
+    size_t maxSize = 0;
+    vector<size_t> maxComponent = {};
+    for (size_t i = 0; i < n; i++) {
+        if (visited[i]) continue;
+        vector<size_t> component;
+        dfs(graph, visited, i, component);
+        if (maxSize < component.size()) {
+            maxSize = component.size();
+            maxComponent = component;
+        }
     }
 
-    // find starts
-    visited = vector<bool>(n, false);
-    for (int i = 0; i < n; i++) {
-        if (visited[i])
-            continue;
-        int curNodeCount = 0;
-        dfs(i, curNodeCount);
+    ofstream fout("graph.out");
+    if (!fout.is_open()) {
+        cerr << "Cannot open graph.out" << endl;
+        return 1;
     }
-
-    // print all
-    visited = vector<bool>(n, false);
-    for (int index : indexes) {
-        if (visited[index])
-            continue;
-        bool isFirst = true;
-        print(index, isFirst);
+    for (size_t i = 0; i < maxComponent.size(); i++) {
+        fout << maxComponent[i];
+        if (i < maxComponent.size() - 1) fout << " ";
     }
+    fout.close();
 
     return 0;
 }
