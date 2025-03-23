@@ -1,28 +1,24 @@
-#include <cassert>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
 
 using namespace std;
 
-void print(vector<vector<char>> &subsets)
+void print(const vector<vector<char>> &subsets)
 {
     cout << "{";
     bool flag1 = true;
     for (int i = 0; i < subsets.size(); i++) {
         if (!flag1)
             cout << ",";
-        else
-            flag1 = false;
+        flag1 = false;
         cout << "{";
         bool flag2 = true;
         for (int j = 0; j < subsets[i].size(); j++) {
             if (!flag2)
                 cout << ",";
-            else
-                flag2 = false;
+            flag2 = false;
             cout << subsets[i][j];
         }
         cout << "}";
@@ -30,7 +26,7 @@ void print(vector<vector<char>> &subsets)
     cout << "}" << endl;
 }
 
-void backtracking(vector<char> &chars, vector<vector<char>> &subsets,
+void backtracking(const vector<char> &chars, vector<vector<char>> &subsets,
                   int startIndex)
 {
     if (startIndex == chars.size()) {

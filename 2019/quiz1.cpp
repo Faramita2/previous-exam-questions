@@ -1,5 +1,3 @@
-#include "../PerformanceMonitor/performance_monitor.h"
-#include <cassert>
 #include <iostream>
 #include <string>
 #include <vector>

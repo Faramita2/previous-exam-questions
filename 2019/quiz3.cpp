@@ -1,7 +1,5 @@
-#include <cassert>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <stack>
 #include <string>
 #include <vector>
@@ -37,7 +35,12 @@ int main()
         }
     }
 
-    cout << operands.top() << endl;
+    double res = operands.top();
+    if (res == (int)res) {
+        cout << (int)res << endl;
+    } else {
+        cout << res << endl;
+    }
 
     return 0;
 }
